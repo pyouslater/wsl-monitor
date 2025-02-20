@@ -24,17 +24,17 @@ def send_notification(message):
     smtp_port = 587
     sender_email = os.environ['EMAIL_USER']
     sender_password = os.environ['EMAIL_PASSWORD']
-    recipient_email = os.environ['NOTIFICATION_EMAIL']
+    recipient_emails = os.environ['NOTIFICATION_EMAIL'].split(',')
 
     msg = MIMEText(message)
     msg['Subject'] = 'WSL Heat Draw Update Alert'
     msg['From'] = sender_email
-    msg['To'] = recipient_email
+    msg['To'] = ', '.join(recipient_emails)  # Join all emails with comma
 
     with smtplib.SMTP(smtp_server, smtp_port) as server:
         server.starttls()
         server.login(sender_email, sender_password)
-        server.send_message(msg)
+        server.send_message(msg, sender_email, recipient_emails)  # Send to all recipients
 
 def main():
     if not is_monitoring_active():
